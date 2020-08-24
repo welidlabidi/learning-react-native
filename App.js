@@ -8,6 +8,9 @@ export default function App() {
   const [modalPopup, setModalPopup] = useState(false);
 
   const addGoals = (nextGoals) => {
+    if (nextGoals.length === 0) {
+      return;
+    }
     setUpdateGoals((currentGoals) => [
       ...currentGoals,
       { id: Math.random().toString(), value: nextGoals },
