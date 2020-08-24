@@ -1,37 +1,51 @@
-import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
-import { StyleSheet, Text, View, Button, TextInput } from "react-native";
+import { StyleSheet, View, Button, FlatList } from "react-native";
+import GoalInput from "./components/goalinput/Goalinput";
+import Goalitem from "./components/goalitem/Goalitem";
 
 export default function App() {
-  const [goals, setGoals] = useState("");
   const [updateGoals, setUpdateGoals] = useState([]);
+  const [modalPopup, setModalPopup] = useState(false);
 
-  const goalInputHandler = (goals) => {
-    setGoals(goals);
+  const addGoals = (nextGoals) => {
+    setUpdateGoals((currentGoals) => [
+      ...currentGoals,
+      { id: Math.random().toString(), value: nextGoals },
+    ]);
+    setModalPopup(false);
   };
 
-  const addGoals = () => {
-    setUpdateGoals((currentGoals) => [...updateGoals, goals]);
+  const cancelgoals = () => setModalPopup(false);
+
+  const deleteItem = (goalId) => {
+    setUpdateGoals((currentGoals) => {
+      return currentGoals.filter((goal) => goal.id !== goalId);
+    });
   };
 
   return (
     <View style={styles.screen}>
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Goals"
-          style={styles.input}
-          onChangeText={goalInputHandler}
-          value={goals}
-        />
-        <Button title="ADD" onPress={addGoals} />
-      </View>
-      <View>
-        {updateGoals.map((goal) => (
-          <View style={styles.listitem}>
-            <Text>{goal}</Text>
-          </View>
-        ))}
-      </View>
+      <Button
+        style={styles.btn}
+        title="Add more goals"
+        onPress={() => setModalPopup(true)}
+      />
+      <GoalInput
+        visible={modalPopup}
+        onAddGoals={addGoals}
+        cancel={cancelgoals}
+      />
+      <FlatList
+        keyExtractor={(item, index) => item.id}
+        data={updateGoals}
+        renderItem={(itemData) => (
+          <Goalitem
+            id={itemData.item.id}
+            onDelete={deleteItem}
+            title={itemData.item.value}
+          />
+        )}
+      />
     </View>
   );
 }
@@ -40,21 +54,7 @@ const styles = StyleSheet.create({
   screen: {
     padding: 50,
   },
-  input: {
-    width: "80%",
-    borderColor: "black",
-    borderWidth: 1,
-    padding: 10,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  listitem: {
-    padding: 10,
-    borderColor: "black",
-    backgroundColor: "#ccc",
-    borderWidth: 1,
+  btn: {
+    marginTop: 50,
   },
 });
